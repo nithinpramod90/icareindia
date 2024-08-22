@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:icareindia/views/presentation/location_screen.dart';
+import 'package:icareindia/model/api/mobile_api.dart';
+import 'package:icareindia/model/components/snackbar.dart';
+import 'package:icareindia/vie-model/otp_controller.dart';
 import 'package:pinput/pinput.dart';
 
 class OtpScreen extends StatelessWidget {
-  const OtpScreen({super.key});
+  final OtpController otpController = Get.put(OtpController());
+  final ApiService apiService = ApiService();
+
+  OtpScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -67,6 +72,7 @@ class OtpScreen extends StatelessWidget {
                     children: [
                       const SizedBox(height: 70),
                       Pinput(
+                        controller: otpController.otpController,
                         length: 6,
                         showCursor: true,
                         defaultPinTheme: PinTheme(
@@ -84,19 +90,29 @@ class OtpScreen extends StatelessWidget {
                           ),
                         ),
                         onCompleted: (value) {
-                          // setState(() {
-                          //   otp = value;
-                          // });
+                          otpController.setOtp(value);
+                          // Now you can use otpController.getOtp() to get the OTP value
                         },
                       ),
                       const SizedBox(height: 100),
                       ElevatedButton(
-                        onPressed: () {
-                          Get.off(() => const LocationScreen());
+                        onPressed: () async {
+                          if (otpController.otpController.text.length < 6) {
+                            showCustomSnackbar(
+                              message: "Please enter otp correctly",
+
+                              title: 'failed',
+                              position: SnackPosition.TOP,
+                              backgroundColor: Colors.black, // Background color
+                            );
+                          } else {
+                            await apiService
+                                .sendOtp(otpController.otpController.text);
+                          }
                         },
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 70, vertical: 25),
+                              horizontal: 70, vertical: 20),
                           backgroundColor: Colors.black, // background color
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),

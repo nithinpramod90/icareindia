@@ -1,12 +1,12 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:icareindia/model/api/mobile_api.dart';
 import 'package:icareindia/model/components/snackbar.dart';
 import 'package:icareindia/vie-model/phone_controller.dart';
-import 'package:icareindia/views/presentation/login%20Screen/otp_screen.dart';
 
 class PhoneAuth extends StatelessWidget {
   final PhoneController controller = Get.put(PhoneController());
+  final ApiService apiService = ApiService();
 
   PhoneAuth({super.key});
 
@@ -118,16 +118,10 @@ class PhoneAuth extends StatelessWidget {
                         height: 120,
                       ),
                       ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async {
                           if (controller.validatePhoneNumber() == null) {
-                            showCustomSnackbar(
-                              message: controller.phoneNumber.value,
-
-                              title: 'Success',
-                              position: SnackPosition.TOP,
-                              backgroundColor: Colors.black, // Background color
-                            );
-                            // Handle the continue action, like navigating to the next screen
+                            await apiService
+                                .sendPhoneNumber(controller.phoneNumber.string);
                           } else {
                             showCustomSnackbar(
                               message: "Enter a valid Phone Number",
@@ -137,11 +131,10 @@ class PhoneAuth extends StatelessWidget {
                               backgroundColor: Colors.black, // Background color
                             );
                           }
-                          // Get.off(() => const OtpScreen());
                         },
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 70, vertical: 25),
+                              horizontal: 70, vertical: 20),
                           backgroundColor: Colors.black, // background color
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
