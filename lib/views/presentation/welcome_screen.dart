@@ -76,7 +76,7 @@ class WelcomeScreen extends StatelessWidget {
                       ),
                       ElevatedButton(
                         onPressed: () {
-                          Get.off(() => const PhoneAuth());
+                          Get.off(() => PhoneAuth());
                         },
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(

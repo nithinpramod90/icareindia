@@ -1,10 +1,14 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:icareindia/model/components/snackbar.dart';
+import 'package:icareindia/vie-model/phone_controller.dart';
 import 'package:icareindia/views/presentation/login%20Screen/otp_screen.dart';
 
 class PhoneAuth extends StatelessWidget {
-  const PhoneAuth({super.key});
+  final PhoneController controller = Get.put(PhoneController());
+
+  PhoneAuth({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -105,11 +109,9 @@ class PhoneAuth extends StatelessWidget {
                           }
                           return null;
                         },
-                        onSaved: (value) {
-                          // Save or process the phone number
-                          if (kDebugMode) {
-                            print('Phone number: $value');
-                          }
+                        onChanged: (value) {
+                          controller.setPhoneNumber(
+                              value); // Update the phone number in the controller
                         },
                       ),
                       const SizedBox(
@@ -117,7 +119,25 @@ class PhoneAuth extends StatelessWidget {
                       ),
                       ElevatedButton(
                         onPressed: () {
-                          Get.off(() => const OtpScreen());
+                          if (controller.validatePhoneNumber() == null) {
+                            showCustomSnackbar(
+                              message: controller.phoneNumber.value,
+
+                              title: 'Success',
+                              position: SnackPosition.TOP,
+                              backgroundColor: Colors.black, // Background color
+                            );
+                            // Handle the continue action, like navigating to the next screen
+                          } else {
+                            showCustomSnackbar(
+                              message: "Enter a valid Phone Number",
+
+                              title: 'Error',
+                              position: SnackPosition.TOP,
+                              backgroundColor: Colors.black, // Background color
+                            );
+                          }
+                          // Get.off(() => const OtpScreen());
                         },
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(
