@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:icareindia/model/components/snackbar.dart';
+import 'package:icareindia/vie-model/location_controller.dart';
 import 'package:icareindia/views/presentation/details_screen.dart';
 
 class LocationScreen extends StatelessWidget {
-  const LocationScreen({super.key});
+  final LocationController locationController = Get.put(LocationController());
+
+  LocationScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -77,8 +81,23 @@ class LocationScreen extends StatelessWidget {
                         height: 60,
                       ),
                       ElevatedButton(
-                        onPressed: () {
-                          Get.off(() => CreateProfileScreen());
+                        onPressed: () async {
+                          await locationController.determinePosition();
+                          if (locationController.longitude.value != 0.0 &&
+                              locationController.latitude.value != 0.0) {
+                            print(locationController.longitude.value);
+                            print(locationController.latitude.value);
+
+                            // Get.off(() => CreateProfileScreen());
+                          } else {
+                            showCustomSnackbar(
+                              message: "Could not retrieve location",
+
+                              title: 'Error',
+                              position: SnackPosition.TOP,
+                              backgroundColor: Colors.black, // Background color
+                            );
+                          }
                         },
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(

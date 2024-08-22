@@ -8,6 +8,7 @@ import 'dart:convert';
 import 'package:icareindia/views/presentation/login%20Screen/otp_screen.dart';
 
 class ApiService {
+  //PhoneNumber Authentication
   Future<void> sendPhoneNumber(String phoneNumber) async {
     final url = Uri.parse('${AppConfig.baseUrl}/api/send-otp');
 
@@ -41,6 +42,7 @@ class ApiService {
     }
   }
 
+//OTP Sending
   Future<void> sendOtp(String otp) async {
     final url = Uri.parse('${AppConfig.baseUrl}/api/verify-otp');
 
