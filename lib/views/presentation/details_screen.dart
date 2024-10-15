@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icareindia/vie-model/profile_controller.dart';
-import 'package:icareindia/views/presentation/home_screen.dart';
 
 class CreateProfileScreen extends StatelessWidget {
   final ProfileController controller = Get.put(ProfileController());
@@ -137,7 +136,132 @@ class CreateProfileScreen extends StatelessWidget {
                 keyboardType: TextInputType.phone,
                 onChanged: controller.setAlternateNumber,
               ),
-              const SizedBox(height: 25),
+
+              SizedBox(height: MediaQuery.of(context).size.height / 17),
+              const Text(
+                "Address",
+                style: TextStyle(
+                  color: Colors.black,
+                  fontFamily: 'Urbanist',
+                  fontWeight: FontWeight.w800,
+                  fontSize: 20,
+                ),
+              ),
+              const SizedBox(height: 20),
+              TextFormField(
+                style: const TextStyle(
+                  color: Colors.black,
+                  fontFamily: 'Urbanist',
+                  fontWeight: FontWeight.w500,
+                  fontSize: 20,
+                ),
+                decoration: InputDecoration(
+                  labelText: 'House / Flat / Block No',
+                  labelStyle: const TextStyle(
+                    color: Colors.black,
+                    fontFamily: 'Urbanist',
+                    fontWeight: FontWeight.w300,
+                    fontSize: 20,
+                  ),
+                  hintStyle: const TextStyle(
+                    color: Colors.black,
+                    fontFamily: 'Urbanist',
+                    fontWeight: FontWeight.w500,
+                    fontSize: 20,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                onChanged: controller.sethousename,
+              ),
+              const SizedBox(height: 20),
+              TextFormField(
+                style: const TextStyle(
+                  color: Colors.black,
+                  fontFamily: 'Urbanist',
+                  fontWeight: FontWeight.w500,
+                  fontSize: 20,
+                ),
+                decoration: InputDecoration(
+                  labelText: 'City',
+                  labelStyle: const TextStyle(
+                    color: Colors.black,
+                    fontFamily: 'Urbanist',
+                    fontWeight: FontWeight.w300,
+                    fontSize: 20,
+                  ),
+                  hintStyle: const TextStyle(
+                    fontFamily: 'Urbanist',
+                    color: Colors.black,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 20,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                onChanged: controller.setcity,
+              ),
+              const SizedBox(height: 20),
+              TextFormField(
+                style: const TextStyle(
+                  color: Colors.black,
+                  fontFamily: 'Urbanist',
+                  fontWeight: FontWeight.w500,
+                  fontSize: 20,
+                ),
+                decoration: InputDecoration(
+                  labelText: 'State',
+                  labelStyle: const TextStyle(
+                    color: Colors.black,
+                    fontFamily: 'Urbanist',
+                    fontWeight: FontWeight.w300,
+                    fontSize: 20,
+                  ),
+                  hintStyle: const TextStyle(
+                    fontFamily: 'Urbanist',
+                    color: Colors.black,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 20,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                onChanged: controller.setstate,
+              ),
+              const SizedBox(height: 20),
+              TextFormField(
+                style: const TextStyle(
+                  color: Colors.black,
+                  fontFamily: 'Urbanist',
+                  fontWeight: FontWeight.w500,
+                  fontSize: 20,
+                ),
+                decoration: InputDecoration(
+                  labelText: 'Pin Code',
+                  labelStyle: const TextStyle(
+                    color: Colors.black,
+                    fontFamily: 'Urbanist',
+                    fontWeight: FontWeight.w300,
+                    fontSize: 20,
+                  ),
+                  hintStyle: const TextStyle(
+                    fontFamily: 'Urbanist',
+                    color: Colors.black,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 20,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                onChanged: controller.setpostalcode,
+              ),
+              const SizedBox(
+                height: 18,
+              ),
               const Center(
                 child: Text(
                   'Your Privacy is Our Priority. We safeguard your personal information with the highest standards of security and confidentiality.',
@@ -146,16 +270,19 @@ class CreateProfileScreen extends StatelessWidget {
                 ),
               ),
               SizedBox(
-                height: MediaQuery.of(context).size.height / 3.5,
+                height: MediaQuery.of(context).size.height / 18,
               ),
+              const SizedBox(height: 25),
+
               // const Spacer(),
               Center(
                 child: ElevatedButton(
-                  onPressed: () {
-                    // print(controller.selectedGender.value);
-                    // print(controller.name.value);
-                    // print(controller.alternateNumber.value);
-                    Get.off(() => const HomeScreen());
+                  onPressed: () async {
+                    print("button done");
+                    ProfileController profileController = Get.find();
+
+                    // Call the sendProfileData method to send the data to the API
+                    await profileController.sendProfileData();
                   },
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(

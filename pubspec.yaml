@@ -11,11 +11,17 @@ dependencies:
   cupertino_icons: ^1.0.6
   flutter:
     sdk: flutter
+  flutter_secure_storage: ^9.2.2
+  geocoding: ^3.0.0
   geolocator: ^13.0.1
   get: ^4.6.6
+  get_storage: ^2.1.1
+  google_nav_bar: ^5.0.6
   http: ^1.2.2
+  line_icons: ^2.0.3
   lottie: ^3.1.2
   pinput: ^5.0.0
+  shimmer: ^3.0.0
   url_launcher: ^6.3.0
 
 dev_dependencies:

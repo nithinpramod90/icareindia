@@ -13,8 +13,6 @@ class OtpScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // String otp = '';
-
     return Scaffold(
       body: SafeArea(
         child: Column(

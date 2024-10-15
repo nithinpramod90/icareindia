@@ -50,7 +50,7 @@ class PhoneAuth extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(
-                      height: 80,
+                      height: 90,
                     ),
                   ],
                 ),
@@ -58,7 +58,7 @@ class PhoneAuth extends StatelessWidget {
             ),
             Expanded(
               child: Container(
-                width: MediaQuery.of(context).size.width,
+                width: MediaQuery.of(context).size.height,
                 padding: const EdgeInsets.all(20.0),
                 decoration: BoxDecoration(
                   color: Colors.grey.shade300,
@@ -67,7 +67,7 @@ class PhoneAuth extends StatelessWidget {
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      const SizedBox(height: 40),
+                      const SizedBox(height: 50),
                       const Row(
                         children: [
                           Text(

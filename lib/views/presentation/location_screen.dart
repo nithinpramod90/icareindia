@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:icareindia/model/api/mobile_api.dart';
 import 'package:icareindia/model/components/snackbar.dart';
 import 'package:icareindia/vie-model/location_controller.dart';
-import 'package:icareindia/views/presentation/details_screen.dart';
+import 'package:icareindia/vie-model/location_fetch_controller.dart';
 
 class LocationScreen extends StatelessWidget {
   final LocationController locationController = Get.put(LocationController());
+  final ApiService apiService = ApiService();
+  final LocationFetchController locationFetchController =
+      Get.put(LocationFetchController());
 
   LocationScreen({super.key});
 
@@ -87,8 +91,10 @@ class LocationScreen extends StatelessWidget {
                               locationController.latitude.value != 0.0) {
                             print(locationController.longitude.value);
                             print(locationController.latitude.value);
-
-                            // Get.off(() => CreateProfileScreen());
+                            await apiService.sendLocation(
+                                locationController.latitude.value.toString(),
+                                locationController.longitude.value.toString());
+                            await locationFetchController.fetchLocation();
                           } else {
                             showCustomSnackbar(
                               message: "Could not retrieve location",
