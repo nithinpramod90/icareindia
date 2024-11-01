@@ -27,7 +27,7 @@ class SearchController extends GetxController {
     }
 
     // Print the search results for debugging
-    print("Search Results: ${searchResults}");
+    print("Search Results: $searchResults");
   }
 
   void printQuery() {

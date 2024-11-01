@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:icareindia/vie-model/fetchissue_controller.dart';
 
 class SubcategoryScreen extends StatelessWidget {
   const SubcategoryScreen({super.key});
@@ -48,7 +49,8 @@ class SubcategoryScreen extends StatelessWidget {
             ),
             trailing: const Icon(Icons.arrow_forward_ios),
             onTap: () {
-              print('${subcategory['name']} tapped');
+              fetchIssueDetails(subcategory['id'].toString());
+              print('${subcategory['id']} tapped');
             },
           );
         },

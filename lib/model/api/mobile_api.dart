@@ -8,9 +8,13 @@ import 'package:icareindia/model/components/loader.dart';
 import 'package:icareindia/model/components/snackbar.dart';
 import 'package:icareindia/vie-model/location_fetch_controller.dart';
 import 'package:icareindia/views/presentation/details_screen.dart';
+import 'package:icareindia/views/presentation/home_screen.dart';
 import 'package:icareindia/views/presentation/location_screen.dart';
 import 'dart:convert';
 import 'package:icareindia/views/presentation/login%20Screen/otp_screen.dart';
+import 'package:icareindia/views/presentation/slots_screen.dart';
+import 'package:icareindia/views/presentation/sucess_screen.dart';
+import 'package:icareindia/views/presentation/welcome_screen.dart';
 
 class ApiService {
   //storing of sessionid
@@ -19,6 +23,20 @@ class ApiService {
 //get session id
   Future<String?> getSessionId() async {
     return await storage.read(key: 'sessionId');
+  }
+
+  Future<void> deleteSessionId() async {
+    await storage.delete(key: 'sessionId');
+    print('Session ID deleted');
+  }
+
+  Future<void> deleteRefreshToken() async {
+    await storage.delete(key: 'Refreshtoken');
+    print('Refresh ID deleted');
+  }
+
+  Future<String?> getRefreshToken() async {
+    return await storage.read(key: 'Refreshtoken');
   }
 
   //PhoneNumber Authentication
@@ -103,10 +121,17 @@ class ApiService {
       // Extract success, message, and userExist from the response
       final bool success = responseData['success'];
       final String message = responseData['message'];
+
       final bool exists = responseData['exists']; // Checking userExist status
       print("$success,$message,$exists");
       if (success) {
+        print("$success,$message,$exists");
+
         if (exists) {
+          final String sessionid = responseData["sessionid"];
+          final String refreshtoken = responseData["refresh_token"];
+          await storage.write(key: 'Refreshtoken', value: refreshtoken);
+          await storage.write(key: 'sessionId', value: sessionid);
           await locationFetchController.fetchLocation();
         } else {
           // Navigate to registration screen if user doesn't exist (e.g., RegistrationScreen)
@@ -115,7 +140,57 @@ class ApiService {
       } else {
         // If success is false, show error in a snackbar
         showCustomSnackbar(
-          message: message, // Show the message from the response
+          message: message, // Show thpe message from the response
+          title: 'Error',
+          position: SnackPosition.TOP,
+          backgroundColor: Colors.red,
+        );
+      }
+    } catch (e) {
+      // Close loader in case of an exception
+      Get.back();
+
+      // Handle any error
+      print('Error: $e');
+      showCustomSnackbar(
+        message: "An unexpected error occurred. Please try again.",
+        title: 'Error',
+        position: SnackPosition.TOP,
+        backgroundColor: Colors.red, // Get.dialog(
+        //   const LottieLoader(),
+        //   barrierDismissible: false,
+        // );
+      );
+    }
+  }
+
+  Future<void> refreshtoken() async {
+    final url = Uri.parse('${AppConfig.baseUrl}/api/token/refresh');
+    final refreshtoken = await getRefreshToken();
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'refresh': refreshtoken,
+        }),
+      );
+
+      // Parse the response body as JSON
+      final responseData = jsonDecode(response.body);
+
+      final String sessionid = responseData["access"];
+
+      print("$refreshtoken,$sessionid");
+      if (response.statusCode == 200) {
+        await storage.write(key: 'sessionId', value: sessionid);
+      } else {
+        // If success is false, show error in a snackbar
+        showCustomSnackbar(
+          message:
+              "Server Under Service", // Show thpe message from the response
           title: 'Error',
           position: SnackPosition.TOP,
           backgroundColor: Colors.red,
@@ -173,10 +248,13 @@ class ApiService {
       final bool success = responseData['success'];
       final String message = responseData['message'];
       final String sessionid = responseData['sessionid'];
-      print("$success,$message,$sessionid");
+      final String refreshtoken = responseData['refresh_token'];
+      print("$success,$message,$sessionid,$refreshtoken");
       if (success) {
         print("sucess");
         await storage.write(key: 'sessionId', value: sessionid);
+        await storage.write(key: 'Refreshtoken', value: refreshtoken);
+
         await box.remove('phoneNumber');
 
         Get.back();
@@ -196,6 +274,9 @@ class ApiService {
     } catch (e) {
       // Close loader in case of an exception
       Get.back();
+      // Get.off(() => const SuccessScreen(
+      //       message: 'Sucessfull Luttapi',
+      //     ));
 
       // Handle any error
       print('Error: $e');
@@ -220,14 +301,15 @@ class ApiService {
         url,
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': 'Bearer $sessionId',
         },
         body: jsonEncode({
-          'sessionId': sessionId,
           'lat': lat,
           'lon': lon,
         }),
       );
       final responseData = jsonDecode(response.body);
+      print(responseData);
       final bool success = responseData['success'];
       final String message = responseData['message'];
       print("$success,$message");
@@ -270,12 +352,15 @@ class ApiService {
         url,
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': 'Bearer $sessionId',
         },
         body: jsonEncode({
           'sessionId': sessionId,
         }),
       );
       final responseData = jsonDecode(response.body);
+      print(responseData);
+
       final bool success =
           responseData['success'] ?? false; // Default to false if null
       final String message = responseData['message']?.toString() ??
@@ -332,6 +417,7 @@ class ApiService {
 
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
+        print(responseData);
         // Assuming the key for your categories data is 'categories'
         final categories = List<Map<String, dynamic>>.from(responseData);
 
@@ -421,6 +507,317 @@ class ApiService {
         'success': false,
         'message': '$e An unexpected error occurred. Please try again.',
       };
+    }
+  }
+
+  Future<Map<String, dynamic>> sendissue(String id) async {
+    final url = Uri.parse('${AppConfig.baseUrl}/users/issuedetails');
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'id': id,
+        }),
+      );
+      final responseData = jsonDecode(response.body);
+      final bool success = responseData['success'] ?? false;
+
+      if (success) {
+        final maincat = responseData['maincat'];
+        final subcat = responseData['subcat'];
+        return {
+          'success': true,
+          'maincat': maincat,
+          'subcat': subcat,
+        };
+      } else {
+        return {
+          'success': false,
+          'message': 'Failed to fetch issue details.',
+        };
+      }
+    } catch (e) {
+      print('Error: $e');
+      return {
+        'success': false,
+        'message': '$e An unexpected error occurred. Please try again.',
+      };
+    }
+  }
+
+  Future<void> registerissue(String issue, String subcatid) async {
+    final url = Uri.parse('${AppConfig.baseUrl}/users/registerissue');
+    final sessionid = await getSessionId();
+    String audio = "jhhhgf";
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $sessionid',
+        },
+        body: jsonEncode({
+          'audio': audio,
+          'issue': issue,
+          'subcatid': subcatid,
+        }),
+      );
+      final responseData = jsonDecode(response.body);
+      final bool success = responseData['success'] ?? false;
+
+      if (success) {
+        print("success");
+      } else {
+        showCustomSnackbar(
+          message:
+              "Can't Place Service Please Try Later", // Show the message from the response
+          title: 'Error',
+          position: SnackPosition.TOP,
+          backgroundColor: Colors.red,
+        );
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
+  Future<Map<String, dynamic>> fetchslots() async {
+    final url = Uri.parse('${AppConfig.baseUrl}/users/availableslots');
+
+    // Show a loading dialog
+    Get.dialog(
+      const LottieLoader(),
+      barrierDismissible: false,
+    );
+
+    try {
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+
+        // Extracting fields from the response with fallback values
+        final bool success = responseData['success'] ?? false;
+        final String message = responseData['message'] ?? '';
+        final List<dynamic> schedules = responseData['schedules'] ?? [];
+
+        // Log for debugging
+        print('Response Data: $responseData');
+        print(schedules);
+
+        if (success && schedules.isNotEmpty) {
+          print("object");
+          // Navigating to SlotsScreen with schedules as arguments
+          Get.off(
+            () => const SlotsScreen(),
+            arguments: {
+              'schedules': schedules,
+            },
+          );
+        } else {
+          print('No schedules available');
+        }
+
+        return {
+          'success': success,
+          'message': message,
+          'schedules': schedules,
+        };
+      } else {
+        throw Exception('Failed to load slots');
+      }
+    } catch (e) {
+      print('Error fetching slots: $e');
+      throw Exception('Error fetching slots: $e');
+    } finally {
+      Get.back(); // Close the loading dialog
+    }
+  }
+
+  Future<void> sendschedule(String date, String time) async {
+    final sessionId = await getSessionId();
+    final url = Uri.parse('${AppConfig.baseUrl}/users/addtimeslot');
+    Get.dialog(
+      const LottieLoader(),
+      barrierDismissible: false,
+    );
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $sessionId',
+        },
+        body: jsonEncode({
+          'date': date,
+          'time': time,
+        }),
+      );
+      final responseData = jsonDecode(response.body);
+      print(responseData);
+      final bool success = responseData['success'];
+      final String message = responseData['message'];
+      print("$success,$message");
+      if (success) {
+        Get.back();
+        Get.to(() => HomeScreen());
+        // Navigate to registration screen if user doesn't exist (e.g., RegistrationScreen)
+      } else {
+        // If success is false, show error in a snackbar
+        showCustomSnackbar(
+          message: message, // Show the message from the response
+          title: 'Error',
+          position: SnackPosition.TOP,
+          backgroundColor: Colors.red,
+        );
+        await fetchslots();
+      }
+    } catch (e) {
+      // Close loader in case of an exception
+      Get.back();
+
+      // Handle any error
+      print('Error: $e');
+      showCustomSnackbar(
+        message: "An unexpected error occurred. Please try again.",
+        title: 'Error',
+        position: SnackPosition.TOP,
+        backgroundColor: Colors.red,
+      );
+    }
+  }
+
+  Future<Map<String, dynamic>?> fetchUserData() async {
+    final sessionId = await getSessionId();
+    final url = Uri.parse('${AppConfig.baseUrl}/users/profile');
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $sessionId',
+        },
+      );
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      } else {
+        print('Server error: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Error fetching data: $e');
+      return null;
+    }
+  }
+
+  Future<void> logout() async {
+    final sessionId = await getSessionId();
+
+    final refreshtoken = await getRefreshToken();
+    final url = Uri.parse('${AppConfig.baseUrl}/users/logout');
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $sessionId',
+        },
+        body: jsonEncode({
+          'refreshtoken': refreshtoken,
+        }),
+      );
+      final responseData = jsonDecode(response.body);
+      print(responseData);
+      final bool success = responseData['success'];
+      final String message = responseData['message'];
+      print("$success,$message");
+      if (success) {
+        await deleteSessionId();
+        await deleteRefreshToken();
+        Get.back();
+        Get.off(() => WelcomeScreen());
+        // Navigate to registration screen if user doesn't exist (e.g., RegistrationScreen)
+      } else {
+        // If success is false, show error in a snackbar
+        showCustomSnackbar(
+          message: message, // Show the message from the response
+          title: 'Error',
+          position: SnackPosition.TOP,
+          backgroundColor: Colors.red,
+        );
+      }
+    } catch (e) {
+      // Close loader in case of an exception
+      Get.back();
+
+      // Handle any error
+      print('Error: $e');
+      showCustomSnackbar(
+        message: "An unexpected error occurred. Please try again.",
+        title: 'Error',
+        position: SnackPosition.TOP,
+        backgroundColor: Colors.red,
+      );
+    }
+  }
+
+  Future<void> delete() async {
+    final sessionId = await getSessionId();
+
+    final refreshtoken = await getRefreshToken();
+    final url = Uri.parse('${AppConfig.baseUrl}/users/delete');
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $sessionId',
+        },
+        body: jsonEncode({
+          'refreshtoken': refreshtoken,
+        }),
+      );
+      final responseData = jsonDecode(response.body);
+      print(responseData);
+      final bool success = responseData['success'];
+      final String message = responseData['message'];
+      print("$success,$message");
+      if (success) {
+        await deleteSessionId();
+        await deleteRefreshToken();
+        Get.back();
+        Get.off(() => WelcomeScreen());
+        // Navigate to registration screen if user doesn't exist (e.g., RegistrationScreen)
+      } else {
+        // If success is false, show error in a snackbar
+        showCustomSnackbar(
+          message: message, // Show the message from the response
+          title: 'Error',
+          position: SnackPosition.TOP,
+          backgroundColor: Colors.red,
+        );
+      }
+    } catch (e) {
+      // Close loader in case of an exception
+      Get.back();
+
+      // Handle any error
+      print('Error: $e');
+      showCustomSnackbar(
+        message: "An unexpected error occurred. Please try again.",
+        title: 'Error',
+        position: SnackPosition.TOP,
+        backgroundColor: Colors.red,
+      );
     }
   }
 }

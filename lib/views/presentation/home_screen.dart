@@ -60,7 +60,7 @@ class HomeScreen extends StatelessWidget {
             // Wrap GridView with a Container and set a maximum height
             categories.isEmpty
                 ? const Center(child: Text('No data found'))
-                : Container(
+                : SizedBox(
                     // Set a max height for the grid
                     height: MediaQuery.of(context).size.height / 1.55,
                     child: buildCategoryGrid(categories),
