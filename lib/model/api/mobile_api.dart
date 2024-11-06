@@ -8,7 +8,6 @@ import 'package:icareindia/model/components/loader.dart';
 import 'package:icareindia/model/components/snackbar.dart';
 import 'package:icareindia/vie-model/location_fetch_controller.dart';
 import 'package:icareindia/views/presentation/details_screen.dart';
-import 'package:icareindia/views/presentation/home_screen.dart';
 import 'package:icareindia/views/presentation/location_screen.dart';
 import 'dart:convert';
 import 'package:icareindia/views/presentation/login%20Screen/otp_screen.dart';
@@ -669,7 +668,9 @@ class ApiService {
       print("$success,$message");
       if (success) {
         Get.back();
-        Get.to(() => HomeScreen());
+        Get.to(() => const SuccessScreen(
+              message: "Service Placed SucessFully",
+            ));
         // Navigate to registration screen if user doesn't exist (e.g., RegistrationScreen)
       } else {
         // If success is false, show error in a snackbar
@@ -818,6 +819,108 @@ class ApiService {
         position: SnackPosition.TOP,
         backgroundColor: Colors.red,
       );
+    }
+  }
+
+  Future<Map<String, List<Map<String, dynamic>>>?> services() async {
+    final sessionId = await getSessionId();
+    final url = Uri.parse('${AppConfig.baseUrl}/users/myservices');
+
+    // Show loader
+    // Get.dialog(
+    //   const LottieLoader(),
+    //   barrierDismissible: false,
+    // );
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $sessionId',
+        },
+      );
+
+      final responseData = jsonDecode(response.body);
+      print(responseData);
+
+      if (response.statusCode == 200) {
+        return {
+          'upcoming': List<Map<String, dynamic>>.from(responseData['upcoming']),
+          'previous': List<Map<String, dynamic>>.from(responseData['previous']),
+        };
+      } else {
+        throw Exception('Failed to load services');
+      }
+    } catch (e) {
+      print('Error: $e');
+
+      // Show error message to the user
+      showCustomSnackbar(
+        message: "An unexpected error occurred. Please try again.",
+        title: 'Error',
+        position: SnackPosition.TOP,
+        backgroundColor: Colors.red,
+      );
+
+      return null;
+    }
+  }
+
+  Future<Map<String, dynamic>?> servicesdetail(String id) async {
+    final sessionId = await getSessionId();
+    final url = Uri.parse('${AppConfig.baseUrl}/users/servicedetails');
+
+    // Show loader
+    Get.dialog(
+      const LottieLoader(),
+      barrierDismissible: false,
+    );
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $sessionId',
+        },
+        body: jsonEncode({
+          'id': id,
+        }),
+      );
+
+      Get.back(); // Hide loader
+
+      final responseData = jsonDecode(response.body);
+      print(responseData);
+
+      if (response.statusCode == 200) {
+        return {
+          'image': responseData['image'],
+          'maincat': responseData['maincat'],
+          'subcat': responseData['subcat'],
+          'description': responseData['description'],
+          'spare': responseData['spare'],
+          'service': responseData['service'],
+          'total': responseData['total'],
+          'upcoming': responseData['upcoming'],
+        };
+      } else {
+        throw Exception('Failed to load services');
+      }
+    } catch (e) {
+      print('Error: $e');
+      Get.back(); // Hide loader if error occurs
+
+      // Show error message to the user
+      showCustomSnackbar(
+        message: "An unexpected error occurred. Please try again.",
+        title: 'Error',
+        position: SnackPosition.TOP,
+        backgroundColor: Colors.red,
+      );
+
+      return null;
     }
   }
 }

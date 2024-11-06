@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:icareindia/views/presentation/home_screen.dart';
 
 class SuccessScreen extends StatelessWidget {
   final String message;
@@ -44,7 +46,9 @@ class SuccessScreen extends StatelessWidget {
             ),
             // Continue button
             ElevatedButton(
-              onPressed: () async {},
+              onPressed: () async {
+                Get.offAll(() => HomeScreen());
+              },
               style: ElevatedButton.styleFrom(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 100, vertical: 20),

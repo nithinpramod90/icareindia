@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:icareindia/views/presentation/service_screen.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:get/get.dart';
 
@@ -52,6 +53,10 @@ class BottomNavBar extends StatelessWidget {
                   text: 'Store',
                 ),
                 GButton(
+                  icon: LineIcons.servicestack,
+                  text: "Service's",
+                ),
+                GButton(
                   icon: LineIcons.user,
                   text: 'Profile',
                 ),
@@ -66,7 +71,9 @@ class BottomNavBar extends StatelessWidget {
                 } else if (index == 1) {
                   Get.offNamed('/store'); // Navigate to Store page
                 } else if (index == 2) {
-                  Get.offNamed('/profile'); // Navigate to Profile page
+                  Get.to(() => ServiceScreen());
+                } else if (index == 3) {
+                  Get.offNamed('/profile');
                 }
               },
             ),

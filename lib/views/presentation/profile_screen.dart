@@ -10,6 +10,8 @@ class ProfileScreen extends StatelessWidget {
   final ProfileScreenController profileController =
       Get.put(ProfileScreenController());
   final ApiService apiService = ApiService();
+
+  ProfileScreen({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(

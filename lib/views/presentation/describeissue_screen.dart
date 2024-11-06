@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icareindia/model/api/config.dart';
 import 'package:icareindia/model/api/mobile_api.dart';
+import 'package:icareindia/model/components/audio/audioFeatureWidget.dart';
 import 'package:icareindia/vie-model/fetchslots_controller.dart';
 
 class IssueScreen extends StatelessWidget {
@@ -11,7 +12,7 @@ class IssueScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final url = Uri.parse(AppConfig.baseUrl);
     final ApiService apiService = ApiService();
-    final SlotsController slotsController = Get.put(SlotsController());
+    // final SlotsController slotsController = Get.put(SlotsController());
 
     final Map<String, dynamic> maincat = Get.arguments['maincat'];
     final Map<String, dynamic> subcat = Get.arguments['subcat'];
@@ -169,7 +170,8 @@ class IssueScreen extends StatelessWidget {
             ),
             const SizedBox(
               height: 10,
-            ), //need to add voice
+            ),
+            AudioFeatureWidget(),
             Center(
               child: ElevatedButton(
                 onPressed: () async {

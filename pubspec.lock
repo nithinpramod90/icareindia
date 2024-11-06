@@ -17,14 +17,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.11.0"
-  audio_waveforms:
-    dependency: "direct main"
+  audio_session:
+    dependency: transitive
     description:
-      name: audio_waveforms
-      sha256: a86b271488cef1833bf1c379edf68e884b68f0911d62d48c397175b76c862387
+      name: audio_session
+      sha256: "343e83bc7809fbda2591a49e525d6b63213ade10c76f15813be9aed6657b3261"
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.0"
+    version: "0.1.21"
   boolean_selector:
     dependency: transitive
     description:
@@ -320,6 +320,30 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.6.7"
+  just_audio:
+    dependency: "direct main"
+    description:
+      name: just_audio
+      sha256: a49e7120b95600bd357f37a2bb04cd1e88252f7cdea8f3368803779b925b1049
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.9.42"
+  just_audio_platform_interface:
+    dependency: transitive
+    description:
+      name: just_audio_platform_interface
+      sha256: "0243828cce503c8366cc2090cefb2b3c871aa8ed2f520670d76fd47aa1ab2790"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.3.0"
+  just_audio_web:
+    dependency: transitive
+    description:
+      name: just_audio_web
+      sha256: "9a98035b8b24b40749507687520ec5ab404e291d2b0937823ff45d92cb18d448"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.4.13"
   leak_tracker:
     dependency: transitive
     description:
@@ -417,13 +441,13 @@ packages:
     source: hosted
     version: "1.9.0"
   path_provider:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: path_provider
-      sha256: fec0d61223fba3154d87759e3cc27fe2c8dc498f6386c6d6fc80d1afdd1bf378
+      sha256: "50c5dd5b6e1aaf6fb3a78b33f6aa3afca52bf903a8a5298f53101fdaee55bbcd"
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.4"
+    version: "2.1.5"
   path_provider_android:
     dependency: transitive
     description:
@@ -552,14 +576,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.1.0"
-  shimmer:
-    dependency: "direct main"
+  rxdart:
+    dependency: transitive
     description:
-      name: shimmer
-      sha256: "5f88c883a22e9f9f299e5ba0e4f7e6054857224976a5d9f839d4ebdc94a14ac9"
+      name: rxdart
+      sha256: "5c3004a4a8dbb94bd4bf5412a4def4acdaa12e12f269737a5751369e12d1a962"
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.0"
+    version: "0.28.0"
   sky_engine:
     dependency: transitive
     description: flutter
