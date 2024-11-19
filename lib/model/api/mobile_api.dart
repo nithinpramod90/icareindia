@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -6,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:icareindia/model/api/config.dart';
 import 'package:icareindia/model/components/loader.dart';
 import 'package:icareindia/model/components/snackbar.dart';
+import 'package:icareindia/vie-model/fetchslots_controller.dart';
 import 'package:icareindia/vie-model/location_fetch_controller.dart';
 import 'package:icareindia/views/presentation/details_screen.dart';
 import 'package:icareindia/views/presentation/location_screen.dart';
@@ -14,6 +18,7 @@ import 'package:icareindia/views/presentation/login%20Screen/otp_screen.dart';
 import 'package:icareindia/views/presentation/slots_screen.dart';
 import 'package:icareindia/views/presentation/sucess_screen.dart';
 import 'package:icareindia/views/presentation/welcome_screen.dart';
+import 'package:path_provider/path_provider.dart';
 
 class ApiService {
   //storing of sessionid
@@ -61,6 +66,53 @@ class ApiService {
         box.write('phoneNumber', phoneNumber);
         Get.back(); // Close the loader
         Get.off(() => OtpScreen());
+      } else {
+        Get.back();
+        showCustomSnackbar(
+          message: "Error in Generating OTP Please Try again after Sometime",
+
+          title: 'Error',
+          position: SnackPosition.TOP,
+          backgroundColor: Colors.black, // Background color
+        );
+        // Error
+        // print('Failed to send OTP');
+        print('Status Code: ${response.statusCode}');
+      }
+    } catch (e) {
+      Get.back(); // Close the loader
+      print('Error: $e');
+      showCustomSnackbar(
+        message: "An unexpected error occurred. Please try again.",
+        title: 'Error',
+        position: SnackPosition.TOP,
+        backgroundColor: Colors.red,
+      );
+    }
+  }
+
+  Future<void> resentotp() async {
+    final url = Uri.parse('${AppConfig.baseUrl}/users/resendotp');
+    final box = GetStorage(); // GetStorage instance
+    String phoneNumber = box.read('phoneNumber');
+    Get.dialog(
+      const LottieLoader(), // Show the loader
+      barrierDismissible: false, // Prevent dismissing
+    );
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'phoneNumber': phoneNumber,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        Get.back();
+        showCustomSnackbar(message: "Otp Resend sucessfully");
       } else {
         Get.back();
         showCustomSnackbar(
@@ -548,32 +600,51 @@ class ApiService {
     }
   }
 
-  Future<void> registerissue(String issue, String subcatid) async {
+  Future<void> registerIssue(
+      String issue, String subcatid, String? audioPath) async {
     final url = Uri.parse('${AppConfig.baseUrl}/users/registerissue');
     final sessionid = await getSessionId();
-    String audio = "jhhhgf";
+
     try {
-      final response = await http.post(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $sessionid',
-        },
-        body: jsonEncode({
-          'audio': audio,
-          'issue': issue,
-          'subcatid': subcatid,
-        }),
-      );
-      final responseData = jsonDecode(response.body);
-      final bool success = responseData['success'] ?? false;
+      final request = http.MultipartRequest('POST', url)
+        ..headers['Authorization'] = 'Bearer $sessionid'
+        ..fields['issue'] = issue
+        ..fields['subcatid'] = subcatid;
+
+      // Check if audioPath is provided; if not, use the audio file from assets
+      if (audioPath == "null") {
+        // Load audio from assets
+        final byteData = await rootBundle.load('assets/images/temp.mp3');
+        // Get a temporary directory
+        final tempDir = await getTemporaryDirectory();
+        final tempFile = File('${tempDir.path}/temp.mp3');
+        // Write the asset data to the temporary file
+        await tempFile.writeAsBytes(byteData.buffer.asUint8List());
+        // Add the temporary file to the request
+        final audioFile =
+            await http.MultipartFile.fromPath('audio', tempFile.path);
+        request.files.add(audioFile);
+      } else {
+        // Attach the provided audio file path
+        final audioFile =
+            await http.MultipartFile.fromPath('audio', audioPath!);
+        request.files.add(audioFile);
+      }
+
+      final response = await request.send();
+      final responseData = await response.stream.bytesToString();
+      final responseJson = jsonDecode(responseData);
+      final bool success = responseJson['success'] ?? false;
+      final String id = responseJson['issueid'].toString();
 
       if (success) {
+        await fetchslots(issue);
+        final slotsController = SlotsController();
+        slotsController.loadSlots(id);
         print("success");
       } else {
         showCustomSnackbar(
-          message:
-              "Can't Place Service Please Try Later", // Show the message from the response
+          message: "Can't Place Service Please Try Later",
           title: 'Error',
           position: SnackPosition.TOP,
           backgroundColor: Colors.red,
@@ -584,9 +655,9 @@ class ApiService {
     }
   }
 
-  Future<Map<String, dynamic>> fetchslots() async {
+  Future<Map<String, dynamic>> fetchslots(String issue) async {
     final url = Uri.parse('${AppConfig.baseUrl}/users/availableslots');
-
+    final sessionId = await getSessionId();
     // Show a loading dialog
     Get.dialog(
       const LottieLoader(),
@@ -594,11 +665,15 @@ class ApiService {
     );
 
     try {
-      final response = await http.get(
+      final response = await http.post(
         url,
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': 'Bearer $sessionId',
         },
+        body: jsonEncode({
+          'issueid': issue,
+        }),
       );
 
       if (response.statusCode == 200) {
@@ -642,7 +717,7 @@ class ApiService {
     }
   }
 
-  Future<void> sendschedule(String date, String time) async {
+  Future<void> sendschedule(String date, String time, String id) async {
     final sessionId = await getSessionId();
     final url = Uri.parse('${AppConfig.baseUrl}/users/addtimeslot');
     Get.dialog(
@@ -657,6 +732,7 @@ class ApiService {
           'Authorization': 'Bearer $sessionId',
         },
         body: jsonEncode({
+          'issueid': id,
           'date': date,
           'time': time,
         }),
@@ -680,7 +756,7 @@ class ApiService {
           position: SnackPosition.TOP,
           backgroundColor: Colors.red,
         );
-        await fetchslots();
+        await fetchslots(id);
       }
     } catch (e) {
       // Close loader in case of an exception
@@ -896,6 +972,7 @@ class ApiService {
 
       if (response.statusCode == 200) {
         return {
+          'id': responseData['id'],
           'image': responseData['image'],
           'maincat': responseData['maincat'],
           'subcat': responseData['subcat'],
@@ -921,6 +998,53 @@ class ApiService {
       );
 
       return null;
+    }
+  }
+
+  Future<void> ticket(String ticket, String id) async {
+    final sessionId = await getSessionId();
+
+    final url = Uri.parse('${AppConfig.baseUrl}/users/raiseticket');
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $sessionId',
+        },
+        body: jsonEncode({
+          'ticket': ticket,
+          'issueid': id,
+        }),
+      );
+      final responseData = jsonDecode(response.body);
+      print(responseData);
+      final bool success = responseData['success'];
+      final String message = responseData['message'];
+
+      if (success) {
+        // Navigate to registration screen if user doesn't exist (e.g., RegistrationScreen)
+      } else {
+        // If success is false, show error in a snackbar
+        showCustomSnackbar(
+          message: message, // Show the message from the response
+          title: 'Error',
+          position: SnackPosition.TOP,
+          backgroundColor: Colors.red,
+        );
+      }
+    } catch (e) {
+      // Close loader in case of an exception
+      Get.back();
+
+      // Handle any error
+      print('Error: $e');
+      showCustomSnackbar(
+        message: "An unexpected error occurred. Please try again.",
+        title: 'Error',
+        position: SnackPosition.TOP,
+        backgroundColor: Colors.red,
+      );
     }
   }
 }

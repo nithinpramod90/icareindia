@@ -5,9 +5,9 @@ import 'package:icareindia/views/presentation/slots_screen.dart';
 class SlotsController extends GetxController {
   final ApiService apiService = ApiService();
 
-  Future<void> loadSlots() async {
+  Future<void> loadSlots(String id) async {
     try {
-      final result = await apiService.fetchslots();
+      final result = await apiService.fetchslots(id);
       if (result['success']) {
         // Ensure 'schedules' has a default value if it’s null or missing
         final schedules = result['schedules'] ?? [];
@@ -16,6 +16,7 @@ class SlotsController extends GetxController {
         Get.to(
           () => const SlotsScreen(),
           arguments: {
+            'id': id,
             'schedules': schedules,
           },
         );

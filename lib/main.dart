@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:icareindia/views/presentation/home_screen.dart';
 import 'package:icareindia/views/presentation/profile_screen.dart';
+import 'package:icareindia/views/presentation/service_screen.dart';
 import 'package:icareindia/views/presentation/splash_screen.dart';
 import 'package:icareindia/views/presentation/store_screen.dart';
 
@@ -32,6 +33,7 @@ class MyApp extends StatelessWidget {
         GetPage(name: '/home', page: () => HomeScreen()),
         GetPage(name: '/store', page: () => const StoreScreen()),
         GetPage(name: '/profile', page: () => ProfileScreen()),
+        GetPage(name: '/service', page: () => ServiceScreen()),
       ],
     );
   }

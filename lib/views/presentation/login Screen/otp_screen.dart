@@ -92,7 +92,25 @@ class OtpScreen extends StatelessWidget {
                           // Now you can use otpController.getOtp() to get the OTP value
                         },
                       ),
-                      const SizedBox(height: 100),
+                      SizedBox(
+                        height: 30,
+                      ),
+                      TextButton(
+                          onPressed: () {
+                            final ApiService apiService = ApiService();
+                            apiService.resentotp();
+                          },
+                          child: Text(
+                            "Resend OTP",
+                            style: TextStyle(
+                              decoration: TextDecoration.underline,
+                              color: Colors.black,
+                              fontFamily: 'Urbanist',
+                              fontWeight: FontWeight.w800,
+                              fontSize: 16,
+                            ),
+                          )),
+                      const SizedBox(height: 70),
                       ElevatedButton(
                         onPressed: () async {
                           if (otpController.otpController.text.length < 6) {

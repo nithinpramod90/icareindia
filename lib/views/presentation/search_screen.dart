@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:icareindia/model/api/mobile_api.dart';
 import 'package:icareindia/vie-model/search_controller.dart' as se;
+import 'package:icareindia/views/presentation/describeissue_screen.dart';
 
 class SearchScreen extends StatelessWidget implements PreferredSizeWidget {
   final se.SearchController controller = Get.put(se.SearchController());
@@ -50,9 +52,27 @@ class SearchScreen extends StatelessWidget implements PreferredSizeWidget {
                     fontSize: 18,
                   ),
                 ),
-                onTap: () {
+                onTap: () async {
                   // Print the id when the item is tapped
                   print('Tapped on item with ID: $id');
+                  final ApiService apiService = ApiService();
+                  final result = await apiService.sendissue(id.toString());
+                  if (result['success']) {
+                    final maincat = result['maincat'];
+                    final subcat = result['subcat'];
+                    print(maincat);
+                    print(subcat);
+                    Get.to(
+                      IssueScreen(),
+                      arguments: {
+                        'maincat': maincat,
+                        'subcat': subcat,
+                      },
+                    );
+                  } else {
+                    // Handle error
+                    Get.snackbar('Error', result['message']);
+                  }
                 },
               );
             },

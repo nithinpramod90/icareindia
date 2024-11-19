@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icareindia/model/api/mobile_api.dart';
+import 'package:icareindia/model/components/loader.dart';
 import 'package:icareindia/model/components/snackbar.dart';
 import 'package:icareindia/vie-model/location_controller.dart';
 import 'package:icareindia/vie-model/location_fetch_controller.dart';
@@ -86,6 +87,7 @@ class LocationScreen extends StatelessWidget {
                       ),
                       ElevatedButton(
                         onPressed: () async {
+                          const LottieLoader();
                           await locationController.determinePosition();
                           if (locationController.longitude.value != 0.0 &&
                               locationController.latitude.value != 0.0) {

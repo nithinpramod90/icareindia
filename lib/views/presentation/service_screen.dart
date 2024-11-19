@@ -132,6 +132,7 @@ class ServiceScreen extends StatelessWidget {
     final serviceDetails = await apiService.servicesdetail(id);
 
     if (serviceDetails != null) {
+      print(serviceDetails['id']);
       Get.to(
         ServiceCostScreen(
           details: serviceDetails,

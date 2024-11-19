@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:icareindia/model/api/config.dart';
+
+import '../../model/components/raise_ticket.dart';
 
 class ServiceCostScreen extends StatelessWidget {
   final Map<String, dynamic> details;
@@ -192,30 +195,44 @@ class ServiceCostScreen extends StatelessWidget {
               onTap: () {
                 print("Raise an Issue");
               },
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Raise a Ticket',
-                          style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          'If you have any issue raise a ticket',
-                          style: TextStyle(fontSize: 14, color: Colors.grey),
-                        ),
-                      ],
-                    ),
-                  ],
+              child: InkWell(
+                onTap: () async {
+                  final String id = await details['id'].toString();
+                  print(id);
+                  String? result = await Get.dialog(TextInputPopup(
+                    id: id,
+                  ));
+                  if (result != null) {
+                    // Do something with the input text
+                    Get.snackbar(
+                        'Issue Registered sucessfully', 'Callback Requested');
+                  }
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Raise a Ticket',
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            'If you have any issue raise a ticket',
+                            style: TextStyle(fontSize: 14, color: Colors.grey),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

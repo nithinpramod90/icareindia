@@ -6,7 +6,7 @@ void showCustomSnackbar({
   String title = '',
   SnackPosition position = SnackPosition.BOTTOM,
   Color backgroundColor = Colors.black,
-  int durationInSeconds = 3,
+  int durationInSeconds = 5,
 }) {
   Get.snackbar(
     title, // Title of the Snackbar

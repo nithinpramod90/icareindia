@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:get/get.dart';
-import 'package:icareindia/views/presentation/welcome_screen.dart';
+import 'package:icareindia/model/components/splash_nav.dart';
 // import 'package:icareindia/views/presentation/welcome_screen.dart';
 
 class SplashScreenViewModel extends GetxController {
@@ -14,8 +14,7 @@ class SplashScreenViewModel extends GetxController {
 
   void _startTimer() {
     _timer = Timer(const Duration(seconds: 3), () {
-      Get.off(() => WelcomeScreen());
-      // Get.off(() => LocationScreen());
+      checkSessionAndNavigate();
     });
   }
 

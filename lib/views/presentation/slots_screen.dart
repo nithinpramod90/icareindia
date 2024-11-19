@@ -11,14 +11,15 @@ class SlotsScreen extends StatefulWidget {
 
 class _SlotsScreenState extends State<SlotsScreen> {
   List<dynamic> schedules = Get.arguments['schedules'] ?? [];
+  String id = Get.arguments['id'];
   Map<String, String?> selectedSlots =
       {}; // Store selected time for each date in original format
 
   // Helper function to format the time slots for display
   String formatTimeSlot(String slot) {
-    final period = slot.startsWith('am') ? 'AM' : 'PM';
-    final hour = slot.replaceAll(RegExp(r'[^\d]'), ''); // Removes 'am' or 'pm'
-    return '$hour $period';
+    final period = slot;
+    // final hour = slot.replaceAll(RegExp(r'[^\d]'), ''); // Removes 'am' or 'pm'
+    return period.toUpperCase();
   }
 
   final ApiService apiService = ApiService();
@@ -77,7 +78,7 @@ class _SlotsScreenState extends State<SlotsScreen> {
           onPressed: () {
             selectedSlots.forEach((date, time) {
               if (time != null) {
-                apiService.sendschedule(date, time);
+                apiService.sendschedule(date, time, id);
               }
             });
           },

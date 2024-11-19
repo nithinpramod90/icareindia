@@ -1,40 +1,14 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
-import 'package:icareindia/model/api/mobile_api.dart';
 import 'package:icareindia/vie-model/location_fetch_controller.dart';
 import 'package:icareindia/vie-model/urls.dart';
 import 'package:icareindia/views/presentation/login%20Screen/mobile_auth.dart';
 
 class WelcomeScreen extends StatelessWidget {
   WelcomeScreen({super.key});
-  final ApiService apiService = ApiService();
-
   final LocationFetchController locationFetchController =
       Get.put(LocationFetchController());
-
-  final FlutterSecureStorage storage = const FlutterSecureStorage();
-  void checkSessionAndNavigate() async {
-    String? sessionId =
-        await storage.read(key: 'sessionId'); // Reading the session ID
-
-    if (sessionId != null) {
-      print(sessionId);
-      await apiService.refreshtoken();
-      // Session ID exists, navigate to HomeScreen
-      await locationFetchController.fetchLocation();
-
-      // Get.off(() => SuccessScreen(
-      //       message: 'Sucessfull Luttapi',
-      //     ));
-
-      Get.back();
-    } else {
-      // Session ID doesn't exist, navigate to PhoneAuth
-      Get.off(() => PhoneAuth());
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -105,7 +79,7 @@ class WelcomeScreen extends StatelessWidget {
                       ),
                       ElevatedButton(
                         onPressed: () async {
-                          checkSessionAndNavigate();
+                          Get.off(() => PhoneAuth());
                         },
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(
