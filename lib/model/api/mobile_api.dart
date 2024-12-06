@@ -17,6 +17,7 @@ import 'dart:convert';
 import 'package:icareindia/views/presentation/login%20Screen/otp_screen.dart';
 import 'package:icareindia/views/presentation/slots_screen.dart';
 import 'package:icareindia/views/presentation/sucess_screen.dart';
+import 'package:icareindia/views/presentation/timeslot_screen.dart';
 import 'package:icareindia/views/presentation/welcome_screen.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -636,12 +637,18 @@ class ApiService {
       final responseJson = jsonDecode(responseData);
       final bool success = responseJson['success'] ?? false;
       final String id = responseJson['issueid'].toString();
-
+      final bool managed = responseJson['managed'];
       if (success) {
-        await fetchslots(issue);
-        final slotsController = SlotsController();
-        slotsController.loadSlots(id);
-        print("success");
+        if (managed == true) {
+          Get.to(() => (TimeSlotScreen(id: id)));
+          print("object");
+        } else {
+          await fetchslots(id);
+          final slotsController = SlotsController();
+          slotsController.loadSlots(id);
+        }
+        print(responseData);
+        print(id);
       } else {
         showCustomSnackbar(
           message: "Can't Place Service Please Try Later",
@@ -656,6 +663,7 @@ class ApiService {
   }
 
   Future<Map<String, dynamic>> fetchslots(String issue) async {
+    // print(issue);
     final url = Uri.parse('${AppConfig.baseUrl}/users/availableslots');
     final sessionId = await getSessionId();
     // Show a loading dialog
@@ -946,7 +954,7 @@ class ApiService {
   Future<Map<String, dynamic>?> servicesdetail(String id) async {
     final sessionId = await getSessionId();
     final url = Uri.parse('${AppConfig.baseUrl}/users/servicedetails');
-
+    print(id);
     // Show loader
     Get.dialog(
       const LottieLoader(),
@@ -973,6 +981,10 @@ class ApiService {
       if (response.statusCode == 200) {
         return {
           'id': responseData['id'],
+          'status': responseData['status'],
+          'techimage': responseData['technician']['image'],
+          'techname': responseData['technician']['name'],
+          'techcontact': responseData['technician']['phone'],
           'image': responseData['image'],
           'maincat': responseData['maincat'],
           'subcat': responseData['subcat'],
@@ -1024,6 +1036,157 @@ class ApiService {
 
       if (success) {
         // Navigate to registration screen if user doesn't exist (e.g., RegistrationScreen)
+      } else {
+        // If success is false, show error in a snackbar
+        showCustomSnackbar(
+          message: message, // Show the message from the response
+          title: 'Error',
+          position: SnackPosition.TOP,
+          backgroundColor: Colors.red,
+        );
+      }
+    } catch (e) {
+      // Close loader in case of an exception
+      Get.back();
+
+      // Handle any error
+      print('Error: $e');
+      showCustomSnackbar(
+        message: "An unexpected error occurred. Please try again.",
+        title: 'Error',
+        position: SnackPosition.TOP,
+        backgroundColor: Colors.red,
+      );
+    }
+  }
+
+  Future<Map<String, dynamic>?> payment(String id) async {
+    final sessionId = await getSessionId();
+    final url = Uri.parse('${AppConfig.baseUrl}/users/payment');
+    print(id);
+
+    // Show loader
+    Get.dialog(
+      const LottieLoader(),
+      barrierDismissible: false,
+    );
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $sessionId',
+        },
+        body: jsonEncode({
+          'issueid': id,
+        }),
+      );
+
+      Get.back(); // Hide loader
+
+      final responseData = jsonDecode(response.body);
+      print(responseData);
+
+      if (response.statusCode == 200) {
+        print(responseData);
+        return {
+          'key': responseData['key'],
+          'billed': responseData['billed'],
+          'amount': responseData['amount'],
+          'contact': responseData['phone'],
+        };
+      } else {
+        throw Exception('Failed to load services');
+      }
+    } catch (e) {
+      print('Error: $e');
+      Get.back(); // Hide loader if error occurs
+
+      // Show error message to the user
+      showCustomSnackbar(
+        message: "An unexpected error occurred. Please try again.",
+        title: 'Error',
+        position: SnackPosition.TOP,
+        backgroundColor: Colors.red,
+      );
+
+      return null;
+    }
+  }
+
+  Future<void> prefferedtime(String id, String time) async {
+    final sessionId = await getSessionId();
+
+    final url = Uri.parse('${AppConfig.baseUrl}/users/addprefferedtime');
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $sessionId',
+        },
+        body: jsonEncode({
+          'issueid': id,
+          'time': time,
+        }),
+      );
+      final responseData = jsonDecode(response.body);
+      print(responseData);
+      final bool success = responseData['success'];
+      final String message = responseData['message'];
+      print("$success,$message");
+      if (success) {
+        Get.back();
+        Get.off(() => SuccessScreen(
+              message: 'successfully Placed Service',
+            ));
+        // Navigate to registration screen if user doesn't exist (e.g., RegistrationScreen)
+      } else {
+        // If success is false, show error in a snackbar
+        showCustomSnackbar(
+          message: message, // Show the message from the response
+          title: 'Error',
+          position: SnackPosition.TOP,
+          backgroundColor: Colors.red,
+        );
+      }
+    } catch (e) {
+      // Close loader in case of an exception
+      Get.back();
+
+      // Handle any error
+      print('Error: $e');
+      showCustomSnackbar(
+        message: "An unexpected error occurred. Please try again.",
+        title: 'Error',
+        position: SnackPosition.TOP,
+        backgroundColor: Colors.red,
+      );
+    }
+  }
+
+  Future<void> addaddressline(String address) async {
+    final sessionId = await getSessionId();
+
+    final url = Uri.parse('${AppConfig.baseUrl}/users/addaddressline');
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $sessionId',
+        },
+        body: jsonEncode({
+          'address': address,
+        }),
+      );
+      final responseData = jsonDecode(response.body);
+      print(responseData);
+      final bool success = responseData['success'];
+      final String message = responseData['message'];
+      print("$success,$message");
+      if (success) {
       } else {
         // If success is false, show error in a snackbar
         showCustomSnackbar(

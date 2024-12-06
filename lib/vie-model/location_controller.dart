@@ -1,22 +1,19 @@
 import 'package:get/get.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:icareindia/model/components/loader.dart';
 
 class LocationController extends GetxController {
   var longitude = 0.0.obs;
   var latitude = 0.0.obs;
-  var isLoading = false.obs;
 
   Future<void> determinePosition() async {
-    isLoading.value = true;
     try {
       Position position = await _determinePosition();
       longitude.value = position.longitude;
       latitude.value = position.latitude;
     } catch (e) {
       Get.snackbar('Error', e.toString());
-    } finally {
-      isLoading.value = false;
-    }
+    } finally {}
   }
 
   Future<Position> _determinePosition() async {

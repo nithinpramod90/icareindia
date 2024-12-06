@@ -17,6 +17,7 @@ class ServiceScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: const Text(
           'My Services',
           style: TextStyle(
@@ -79,7 +80,7 @@ class ServiceScreen extends StatelessWidget {
                               imageUrl: "${AppConfig.baseUrl}$imageurl",
                               title: service['name'],
                               subtitle:
-                                  '${service['date']} / ${service['time']}',
+                                  '${service['status']} / ${service['time']}',
                             ),
                           );
                         },
@@ -112,7 +113,7 @@ class ServiceScreen extends StatelessWidget {
                               imageUrl: "${AppConfig.baseUrl}$imageurl",
                               title: service['name'],
                               subtitle:
-                                  '${service['date']} / ${service['time']}',
+                                  '${service['status']} / ${service['time']}',
                             ),
                           );
                         },

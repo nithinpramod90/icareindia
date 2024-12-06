@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:icareindia/model/components/razorpay_widget.dart';
 import 'package:icareindia/views/presentation/home_screen.dart';
 import 'package:icareindia/views/presentation/profile_screen.dart';
 import 'package:icareindia/views/presentation/service_screen.dart';
@@ -11,6 +12,7 @@ import 'package:icareindia/views/presentation/store_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
+  Get.put(RazorpayService());
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
   runApp(const MyApp());

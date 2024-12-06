@@ -58,7 +58,7 @@ class PhoneAuth extends StatelessWidget {
             ),
             Expanded(
               child: Container(
-                width: MediaQuery.of(context).size.height,
+                width: Get.height,
                 padding: const EdgeInsets.all(20.0),
                 decoration: BoxDecoration(
                   color: Colors.grey.shade300,

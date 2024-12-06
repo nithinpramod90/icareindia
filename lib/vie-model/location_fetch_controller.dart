@@ -110,7 +110,7 @@ class LocationFetchController extends GetxController {
       if (placemarks.isNotEmpty) {
         Placemark place = placemarks.first;
         address.value = '${place.street}, ${place.locality}, ${place.country}';
-        print("Address: ${address.value}");
+        await apiService.addaddressline(address.value);
       } else {
         address.value = 'No address found';
       }

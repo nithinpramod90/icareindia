@@ -13,11 +13,12 @@ class SearchScreen extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.grey[900], // Dark grey background
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.grey[300], // Dark grey background
         title: TextField(
           onChanged: controller.updateQuery,
-          style: const TextStyle(color: Colors.white), // White text color
-          cursorColor: Colors.white,
+          style: const TextStyle(color: Colors.black), // White text color
+          cursorColor: Colors.black,
           decoration: InputDecoration(
             hintText: 'Search...',
             hintStyle:
@@ -26,10 +27,19 @@ class SearchScreen extends StatelessWidget implements PreferredSizeWidget {
           ),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.search, color: Colors.white),
-            onPressed: controller.printQuery,
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.black,
+              borderRadius: BorderRadius.circular(50),
+            ),
+            child: IconButton(
+              icon: const Icon(Icons.search, color: Colors.white),
+              onPressed: controller.printQuery,
+            ),
           ),
+          SizedBox(
+            width: 10,
+          )
         ],
       ),
       body: Obx(() {

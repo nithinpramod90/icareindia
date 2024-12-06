@@ -295,22 +295,12 @@ class CreateProfileScreen extends StatelessWidget {
                   },
                 ),
                 const SizedBox(
-                  height: 18,
-                ),
-                const Center(
-                  child: Text(
-                    'Your Privacy is Our Priority. We safeguard your personal information with the highest standards of security and confidentiality.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 12),
-                  ),
-                ),
-                const SizedBox(
                   height: 20,
                 ),
                 Center(
                   child: SizedBox(
                     width: MediaQuery.of(context).size.width / 1.8,
-                    height: MediaQuery.of(context).size.height / 18,
+                    height: MediaQuery.of(context).size.height / 14,
                     child: ElevatedButton(
                       onPressed: () async {
                         // Validate form and show Snackbar if validation fails
@@ -319,6 +309,7 @@ class CreateProfileScreen extends StatelessWidget {
                           await profileController.sendProfileData();
                         } else {
                           showCustomSnackbar(
+                              title: 'Error',
                               message: "Fill the form correctly");
                         }
                       },
@@ -338,6 +329,16 @@ class CreateProfileScreen extends StatelessWidget {
                         ),
                       ),
                     ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 18,
+                ),
+                const Center(
+                  child: Text(
+                    'Your Privacy is Our Priority. We safeguard your personal information with the highest standards of security and confidentiality.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 12),
                   ),
                 ),
                 const SizedBox(height: 25),

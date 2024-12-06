@@ -212,7 +212,7 @@ class _IssueScreenState extends State<IssueScreen> {
               ),
               Center(child: _buildAudioWidget()),
               const SizedBox(
-                height: 10,
+                height: 30,
               ),
               Center(
                 child: ElevatedButton(

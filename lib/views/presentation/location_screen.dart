@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icareindia/model/api/mobile_api.dart';
-import 'package:icareindia/model/components/loader.dart';
 import 'package:icareindia/model/components/snackbar.dart';
+import 'package:icareindia/vie-model/button_controller.dart';
 import 'package:icareindia/vie-model/location_controller.dart';
 import 'package:icareindia/vie-model/location_fetch_controller.dart';
 
@@ -16,6 +16,8 @@ class LocationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final buttonStateController = Get.put(ButtonStateController());
+
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -85,46 +87,83 @@ class LocationScreen extends StatelessWidget {
                       const SizedBox(
                         height: 60,
                       ),
-                      ElevatedButton(
-                        onPressed: () async {
-                          const LottieLoader();
-                          await locationController.determinePosition();
-                          if (locationController.longitude.value != 0.0 &&
-                              locationController.latitude.value != 0.0) {
-                            print(locationController.longitude.value);
-                            print(locationController.latitude.value);
-                            await apiService.sendLocation(
-                                locationController.latitude.value.toString(),
-                                locationController.longitude.value.toString());
-                            await locationFetchController.fetchLocation();
-                          } else {
-                            showCustomSnackbar(
-                              message: "Could not retrieve location",
+                      Obx(() {
+                        return ElevatedButton(
+                          onPressed: buttonStateController
+                                  .isButtonDisabled.value
+                              ? null // Disable button when in a loading state
+                              : () async {
+                                  buttonStateController
+                                      .disableButton(); // Disable button on tap
+                                  try {
+                                    // Determine the user's position
+                                    await locationController
+                                        .determinePosition();
 
-                              title: 'Error',
-                              position: SnackPosition.TOP,
-                              backgroundColor: Colors.black, // Background color
-                            );
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 70, vertical: 20),
-                          backgroundColor: Colors.black, // background color
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
+                                    // Check if a valid location was retrieved
+                                    if (locationController.longitude.value !=
+                                            0.0 &&
+                                        locationController.latitude.value !=
+                                            0.0) {
+                                      print(
+                                          'Longitude: ${locationController.longitude.value}');
+                                      print(
+                                          'Latitude: ${locationController.latitude.value}');
+
+                                      // Send location data to the API
+                                      await apiService.sendLocation(
+                                        locationController.latitude.value
+                                            .toString(),
+                                        locationController.longitude.value
+                                            .toString(),
+                                      );
+
+                                      // Fetch updated location data
+                                      await locationFetchController
+                                          .fetchLocation();
+                                    } else {
+                                      // Show a custom snackbar if location retrieval fails
+                                      showCustomSnackbar(
+                                        message: "Could not retrieve location",
+                                        title: 'Error',
+                                        position: SnackPosition.TOP,
+                                        backgroundColor: Colors.black,
+                                      );
+                                    }
+                                  } catch (e) {
+                                    // Handle unexpected errors
+                                    showCustomSnackbar(
+                                      message: "An error occurred: $e",
+                                      title: 'Error',
+                                      position: SnackPosition.TOP,
+                                      backgroundColor: Colors.red,
+                                    );
+                                  } finally {
+                                    // Re-enable the button after task completion
+                                    buttonStateController.enableButton();
+                                  }
+                                },
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 70, vertical: 20),
+                            backgroundColor: Colors.black, // Background color
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
                           ),
-                        ),
-                        child: const Text(
-                          "Continue",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontFamily: 'Urbanist',
-                            fontWeight: FontWeight.w800,
-                            fontSize: 20,
+                          child: Text(
+                            buttonStateController.isButtonDisabled.value
+                                ? 'Processing...' // Change text when disabled
+                                : 'Continue',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontFamily: 'Urbanist',
+                              fontWeight: FontWeight.w800,
+                              fontSize: 20,
+                            ),
                           ),
-                        ),
-                      ),
+                        );
+                      }),
                       SizedBox(height: MediaQuery.of(context).size.height / 20),
                     ],
                   ),

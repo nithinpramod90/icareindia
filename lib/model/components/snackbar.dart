@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 void showCustomSnackbar({
   required String message,
   String title = '',
-  SnackPosition position = SnackPosition.BOTTOM,
+  SnackPosition position = SnackPosition.TOP,
   Color backgroundColor = Colors.black,
   int durationInSeconds = 5,
 }) {

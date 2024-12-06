@@ -16,6 +16,7 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.grey[200],
         elevation: 0,
         title: const Row(
@@ -36,8 +37,11 @@ class ProfileScreen extends StatelessWidget {
       body: Obx(() {
         if (profileController.isLoading.value) {
           return Center(
-            child:
-                Lottie.asset('assets/images/loader.json'), // Your Lottie loader
+            child: SizedBox(
+                width: Get.width / 6,
+                height: Get.height / 6,
+                child: Lottie.asset(
+                    'assets/images/loader.json')), // Your Lottie loader
           );
         }
 
@@ -52,7 +56,7 @@ class ProfileScreen extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               Text(
-                data['name'] ?? 'John',
+                data['name'] ?? '-',
                 style: const TextStyle(
                   fontFamily: 'Urbanist',
                   fontWeight: FontWeight.bold,
@@ -61,12 +65,10 @@ class ProfileScreen extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               ProfileInfoRow(
-                  label: 'Mobile Number',
-                  value: data['phone'] ?? '+91 70340 00000'),
-              ProfileInfoRow(label: 'Gender', value: data['gender'] ?? 'Male'),
+                  label: 'Mobile Number', value: data['phone'] ?? '-'),
+              ProfileInfoRow(label: 'Gender', value: data['gender'] ?? '-'),
               ProfileInfoRow(
-                  label: 'Alternate Number',
-                  value: data['alt_phone'] ?? '+91 70340 00000'),
+                  label: 'Alternate Number', value: data['alt_phone'] ?? '-'),
               const SizedBox(height: 25),
               const Align(
                 alignment: AlignmentDirectional.centerStart,
@@ -81,12 +83,10 @@ class ProfileScreen extends StatelessWidget {
               ),
               const Divider(),
               const SizedBox(height: 10),
-              AccountSettingsOption(
-                label: 'Edit Profile',
-                onTap: () {
-                  // Add your edit profile action here
-                },
-              ),
+              // AccountSettingsOption(
+              //   label: 'Edit Profile',
+              //   onTap: () {},
+              // ),
               AccountSettingsOption(
                 label: 'Delete Account',
                 onTap: () {
